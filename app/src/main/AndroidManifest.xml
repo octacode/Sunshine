@@ -19,11 +19,9 @@
         </activity>
         <activity android:name=".DetailActivity" />
         <activity android:name=".SettingsActivity"/>
-        
         <provider
             android:authorities="octacode.allblue.code.sunshine"
             android:name=".data.WeatherProvider"/>
-
     </application>
 
 </manifest>
