@@ -1,8 +1,14 @@
 package octacode.allblue.code.sunshine.data;
 
 import android.content.ContentUris;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.provider.BaseColumns;
+
+import java.text.DateFormat;
+import java.util.Date;
+
+import static android.provider.Settings.System.DATE_FORMAT;
 
 /**
  * Created by shasha on 14/12/16.
@@ -31,7 +37,7 @@ public class WeatherContract {
 
         public static final String TABLE_NAME = "weather";
 
-        public static final String _ID = "id";
+        public static final String _ID = "_id";
 
         public static final String COLUMN_LOCATION_KEY = "location_key_id";
 
@@ -107,7 +113,7 @@ public class WeatherContract {
 
             public static final String TABLE_NAME="location";
 
-            public static final String _ID="location_id";
+            public static final String _ID="_id";
 
             public static final String COLUMN_LOCATION_SETTING="location_setting";
 
@@ -120,6 +126,6 @@ public class WeatherContract {
             public static Uri buildLocationUri(long id) {
                 return ContentUris.withAppendedId(CONTENT_URI, id);
             }
-
     }
+
 }

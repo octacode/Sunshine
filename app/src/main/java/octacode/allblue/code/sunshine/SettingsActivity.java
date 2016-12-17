@@ -14,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toolbar;
 
+import octacode.allblue.code.sunshine.data.WeatherContract;
+
 /**
  * Created by shasha on 13/12/16.
  */
@@ -39,6 +41,15 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String string_Value=newValue.toString();
+
+        if(preference.getKey().equals(getString(R.string.ZIP_pref))){
+            FetchWeatherTask fetchWeatherTask=new FetchWeatherTask(this);
+            String location=newValue.toString();
+            fetchWeatherTask.execute(location);
+        }
+        else{
+            getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI,null);
+        }
         if(preference instanceof ListPreference){
             ListPreference listPreference=(ListPreference)preference;
             int prefIndex=listPreference.findIndexOfValue(string_Value);

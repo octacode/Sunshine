@@ -3,12 +3,19 @@ package octacode.allblue.code.sunshine;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -42,11 +49,50 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
+import octacode.allblue.code.sunshine.data.WeatherContract;
+import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
+import octacode.allblue.code.sunshine.data.Weatherdb;
 
-public class ForecastFragment extends Fragment {
+
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    private String mlocation;
+    private static int FORECAST_LOADER=0;
+    private static final String[] FORECAST_COLUMNS = {
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATE_TEXT,
+            WeatherEntry.COLUMN_DESC_TEXT,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING,
+            WeatherEntry.COLUMN_DEGREE,
+            WeatherEntry.COLUMN_WIND_SPEED,
+            WeatherEntry.COLUMN_HUMIDITY,
+            WeatherEntry.COLUMN_PRESSURE
+    };
+
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE = 1;
+    public static final int COL_WEATHER_DESC = 2;
+    public static final int COL_WEATHER_MAX_TEMP = 3;
+    public static final int COL_WEATHER_MIN_TEMP = 4;
+    public static final int COL_WEATHER_CONDITION_ID = 5;
+    public static final int COL_LOCATION_SETTING = 6;
+    public static final int COL_WEATHER_DEGREE = 7;
+    public static final int COL_WEATHER_WIND_SPEED = 8;
+    public static final int COL_WEATHER_HUMIDITY = 9;
+    public static final int COL_WEATHER_PRESSURE = 10;
+
     private OnFragmentInteractionListener mListener;
 
     public ForecastFragment() {
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER,null,this);
     }
 
     @Override
@@ -68,21 +114,24 @@ public class ForecastFragment extends Fragment {
                 startActivity(new Intent(getActivity(),SettingsActivity.class));
                 return true;
             case R.id.action_location:
+                /*
                 Intent intent=null, chooser=null;
                 intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("geo:"+fetchWeatherTask.lat+","+fetchWeatherTask.lon));
                 chooser = Intent.createChooser(intent,"Launch Maps");
                 startActivity(chooser);
+                */
+                updateweather();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
     FetchWeatherTask fetchWeatherTask;
+
     private void updateweather() {
-        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getContext());
-        String data=sharedPreferences.getString(getString(R.string.ZIP_pref),"94043");
-        fetchWeatherTask=new FetchWeatherTask();
-        this.fetchWeatherTask=fetchWeatherTask;
+        String data=Utility.getPreferredLocation(getContext());
+        fetchWeatherTask=new FetchWeatherTask(getContext());
         fetchWeatherTask.execute(data);
     }
 
@@ -92,21 +141,55 @@ public class ForecastFragment extends Fragment {
         updateweather();
     }
 
-    ArrayAdapter<String> aAdapter;
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mlocation != null && !Utility.getPreferredLocation(getContext()).equals(mlocation)){
+            getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
+            updateweather();
+        }
+    }
+
+    ForecastAdapter aAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        aAdapter=new ForecastAdapter(getContext(),null,0);
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> fakeData=new ArrayList<>();
-        aAdapter = new ArrayAdapter<String>(getContext(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, fakeData);
         final ListView lv = (ListView) rootview.findViewById(R.id.list_view_forecast);
         lv.setAdapter(aAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(getContext(),DetailActivity.class).putExtra("data",lv.getItemAtPosition(position).toString()));
+                ForecastAdapter adapter=(ForecastAdapter)parent.getAdapter();
+                Cursor cursor=adapter.getCursor();
+                int weather_condition_id=cursor.getInt(COL_WEATHER_CONDITION_ID);
+                String date=cursor.getString(COL_WEATHER_DATE);
+                String desc=cursor.getString(COL_WEATHER_DESC);
+                double max=cursor.getDouble(COL_WEATHER_MAX_TEMP);
+                double min=cursor.getDouble(COL_WEATHER_MIN_TEMP);
+                double degree=cursor.getDouble(COL_WEATHER_DEGREE);
+                double wind_speed=cursor.getDouble(COL_WEATHER_WIND_SPEED);
+                double humidity=cursor.getDouble(COL_WEATHER_HUMIDITY);
+                double pressure=cursor.getDouble(COL_WEATHER_PRESSURE);
+
+                Intent i=new Intent(getContext(),DetailActivity.class);
+                String[] data_transfer={
+                        date,
+                        desc,
+                        String.valueOf(min),
+                        String.valueOf(max),
+                        String.valueOf(degree),
+                        String.valueOf(wind_speed),
+                        String.valueOf(humidity),
+                        String.valueOf(pressure),
+                        String.valueOf(weather_condition_id)
+                };
+                i.putExtra(Intent.EXTRA_TEXT,data_transfer);
+                startActivity(i);
             }
         });
         return rootview;
@@ -129,160 +212,36 @@ public class ForecastFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String sortOrder = WeatherEntry.COLUMN_DATE_TEXT + " ASC";
+
+        mlocation = Utility.getPreferredLocation(getActivity());
+        Uri weatherLocationUri = WeatherEntry.buildWeatherLocation(mlocation);
+
+        return new CursorLoader(
+                getActivity(),
+                weatherLocationUri,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        aAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        aAdapter.swapCursor(null);
+    }
+
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
 
-
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
-
-        String forecastJsonStr,lat, lon;
-
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-                throws JSONException {
-
-            this.forecastJsonStr=forecastJsonStr;
-            final String OWM_LIST = "list";
-            final String OWM_WEATHER = "weather";
-            final String OWM_TEMPERATURE = "temp";
-            final String OWM_MAX = "max";
-            final String OWM_MIN = "min";
-            final String OWM_DATETIME = "dt";
-            final String OWM_DESCRIPTION = "main";
-
-            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            String[] resultStrs = new String[numDays];
-            for(int i = 0; i < weatherArray.length(); i++) {
-                String day;
-                String description;
-                String highAndLow;
-
-                JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-                long dateTime = dayForecast.getLong(OWM_DATETIME);
-                day = getReadableDateString(dateTime);
-
-                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-                description = weatherObject.getString(OWM_DESCRIPTION);
-
-                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-                SharedPreferences shared_pref=PreferenceManager.getDefaultSharedPreferences(getContext());
-                String number=shared_pref.getString(getString(R.string.UNIT_pref),"0");
-                if(number.equals("1")){
-                    high=1.8*high+32;
-                    low=1.8*low+32;
-                }
-                highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
-            }
-
-            return resultStrs;
-        }
-
-        private String getReadableDateString(long time){
-            Date date = new Date(time * 1000);
-            SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-            return format.format(date).toString();
-        }
-
-        private String formatHighLows(double high, double low) {
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
-        }
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String forecastJsonStr = null;
-            final String BASE_PARAM = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-            final String QUERY_PARAM = "q";
-            final String MODE_PARAM = "mode";
-            final String UNITS_PARAM = "units";
-            final String COUNT_PARAM = "cnt";
-            final String APPID_PARAM = "appid";
-
-            try {
-                Uri.Builder built_uri = Uri.parse(BASE_PARAM).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(MODE_PARAM, "json")
-                        .appendQueryParameter(UNITS_PARAM, "metric")
-                        .appendQueryParameter(COUNT_PARAM, "7")
-                        .appendQueryParameter(APPID_PARAM, "2b602d1d73519843d6df028cb7ae473f");
-                URL url = new URL(built_uri.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    forecastJsonStr = null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    forecastJsonStr = null;
-                }
-                forecastJsonStr = buffer.toString();
-
-            } catch (IOException e) {
-                Log.e("PlaceholderFragment", "Error ", e);
-                forecastJsonStr = null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e("PlaceholderFragment", "Error closing stream", e);
-                    }
-                }
-            }
-            try {
-                return getWeatherDataFromJson(forecastJsonStr,7);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String[] strings) {
-            if(strings!=null){
-
-                aAdapter.clear();
-                for(String dayForcast:strings)
-                    aAdapter.add(dayForcast);
-                aAdapter.notifyDataSetChanged();
-
-                try {
-                    JSONObject weather=new JSONObject(forecastJsonStr);
-                    JSONObject city=weather.getJSONObject("city");
-                    String city_name=city.getString("name");
-                    JSONObject coordinates=city.getJSONObject("coord");
-                    this.lat=coordinates.get("lat").toString();
-                    this.lon=coordinates.get("lon").toString();
-                    Toast.makeText(getContext(),lat+"  "+city_name+"  "+lon,Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 }
