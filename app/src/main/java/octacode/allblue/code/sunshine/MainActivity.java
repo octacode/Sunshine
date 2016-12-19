@@ -16,9 +16,4 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_in_main,new ForecastFragment()).commit();
     }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }

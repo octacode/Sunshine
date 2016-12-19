@@ -2,56 +2,30 @@ package octacode.allblue.code.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
-import android.view.Display;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.prefs.Preferences;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
 import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
 import octacode.allblue.code.sunshine.data.Weatherdb;
+import octacode.allblue.code.sunshine.sync.SunshineSyncAdapter;
 
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -69,7 +43,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_DEGREE,
             WeatherEntry.COLUMN_WIND_SPEED,
             WeatherEntry.COLUMN_HUMIDITY,
-            WeatherEntry.COLUMN_PRESSURE
+            WeatherEntry.COLUMN_PRESSURE,
+            WeatherContract.LocationEntry.COLUMN_LATITUDE,
+            WeatherContract.LocationEntry.COLUMN_LONGITUDE
     };
 
     public static final int COL_WEATHER_ID = 0;
@@ -83,8 +59,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_WIND_SPEED = 8;
     public static final int COL_WEATHER_HUMIDITY = 9;
     public static final int COL_WEATHER_PRESSURE = 10;
-
-    private OnFragmentInteractionListener mListener;
+    public static final int COL_LOCATION_LATITUDE=11;
+    public static final int COL_LOCATION_LONGITUDE=12;
 
     public ForecastFragment() {
     }
@@ -114,25 +90,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 startActivity(new Intent(getActivity(),SettingsActivity.class));
                 return true;
             case R.id.action_location:
-                /*
-                Intent intent=null, chooser=null;
+                Cursor cursor=aAdapter.getCursor();
+                double menu_lat=cursor.getDouble(COL_LOCATION_LATITUDE);
+                double menu_lon=cursor.getDouble(COL_LOCATION_LONGITUDE);
+                Intent intent,chooser;
                 intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("geo:"+fetchWeatherTask.lat+","+fetchWeatherTask.lon));
-                chooser = Intent.createChooser(intent,"Launch Maps");
+                intent.setData(Uri.parse("geo:"+menu_lat+","+menu_lon));
+                chooser = Intent.createChooser(intent,"Your Location");
                 startActivity(chooser);
-                */
-                updateweather();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    FetchWeatherTask fetchWeatherTask;
 
     private void updateweather() {
-        String data=Utility.getPreferredLocation(getContext());
-        fetchWeatherTask=new FetchWeatherTask(getContext());
-        fetchWeatherTask.execute(data);
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
@@ -146,8 +119,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onResume();
         if(mlocation != null && !Utility.getPreferredLocation(getContext()).equals(mlocation)){
             getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
-            updateweather();
         }
+        updateweather();
     }
 
     ForecastAdapter aAdapter;
@@ -164,8 +137,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ForecastAdapter adapter=(ForecastAdapter)parent.getAdapter();
-                Cursor cursor=adapter.getCursor();
+                aAdapter=(ForecastAdapter)parent.getAdapter();
+                Cursor cursor=aAdapter.getCursor();
                 int weather_condition_id=cursor.getInt(COL_WEATHER_CONDITION_ID);
                 String date=cursor.getString(COL_WEATHER_DATE);
                 String desc=cursor.getString(COL_WEATHER_DESC);
@@ -198,18 +171,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -241,7 +207,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 
 }

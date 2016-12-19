@@ -57,7 +57,9 @@ public class DetailFragment extends Fragment{
         String date=data_fetched[0];
         String desc=data_fetched[1];
         String min=data_fetched[2];
+        min=min+"°";
         String max=data_fetched[3];
+        max=max+"°";
         float degree= Float.parseFloat(data_fetched[4]);
         float wind_speed= Float.parseFloat(data_fetched[5]);
         float humidity= Float.parseFloat(data_fetched[6]);

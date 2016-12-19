@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:Shasha="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:Shasha="http://schemas.android.com/apk/res-auto">
 
     <item android:showAsAction="never"
         android:title="Settings"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:id="@+id/action_settings"
         />
     <item
@@ -14,4 +14,5 @@
         android:icon="@android:drawable/ic_menu_share"
         Shasha:showAsAction="ifRoom"
         android:id="@+id/action_share" />
+
 </menu>

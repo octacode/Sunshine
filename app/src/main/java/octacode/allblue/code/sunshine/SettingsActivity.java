@@ -1,24 +1,19 @@
 package octacode.allblue.code.sunshine;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
 
-/**
- * Created by shasha on 13/12/16.
- */
+
 
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
@@ -29,6 +24,12 @@ public class SettingsActivity extends PreferenceActivity
         addPreferencesFromResource(R.xml.fragment_settings);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.ZIP_pref)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.UNIT_pref)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     private void bindPreferenceSummaryToValue(Preference preference) {
@@ -43,9 +44,7 @@ public class SettingsActivity extends PreferenceActivity
         String string_Value=newValue.toString();
 
         if(preference.getKey().equals(getString(R.string.ZIP_pref))){
-            FetchWeatherTask fetchWeatherTask=new FetchWeatherTask(this);
             String location=newValue.toString();
-            fetchWeatherTask.execute(location);
         }
         else{
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI,null);
