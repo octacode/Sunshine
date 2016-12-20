@@ -95,7 +95,10 @@ public class DetailFragment extends Fragment{
             case R.id.action_share:
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, desc_tv.getText().toString()+"#Sunshine");
+                sendIntent.putExtra(Intent.EXTRA_TEXT,
+                        "Date: "+date_tv.getText().toString()+"\n"+
+                        "Forecast: "+desc_tv.getText().toString()+"\n"+"Max: "
+                        +max_tv.getText().toString()+", Min: "+min_tv.getText().toString()+"\n#Sunshine"+"#OctaCode");
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
         }
