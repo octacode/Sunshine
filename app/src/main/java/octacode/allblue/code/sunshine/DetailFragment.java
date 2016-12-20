@@ -38,12 +38,15 @@ public class DetailFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((DetailActivity) getActivity()).themeApplier();
         setHasOptionsMenu(true);
     }
+
     @Override
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         final String[] data_fetched=getActivity().getIntent().getStringArrayExtra(Intent.EXTRA_TEXT);
 
@@ -90,7 +93,7 @@ public class DetailFragment extends Fragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_settings:
-                startActivity(new Intent(getContext(),SettingsActivity.class));
+                startActivity(new Intent(getContext(),SettingsFragment.class));
                 return true;
             case R.id.action_share:
                 Intent sendIntent = new Intent();

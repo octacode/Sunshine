@@ -75,6 +75,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        ((MainActivity) getActivity()).themeApplier();
     }
 
     @Override
@@ -87,7 +88,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivity(new Intent(getActivity(),SettingsActivity.class));
+                startActivity(new Intent(getActivity(),SettingsFragment.class));
                 return true;
             case R.id.action_location:
                 Cursor cursor=aAdapter.getCursor();

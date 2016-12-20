@@ -1,9 +1,15 @@
 <ScrollView
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:background="#f1f5f8"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="14dp">
+
+        <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -113,4 +119,5 @@
             android:text="June 18"
             android:textColor="#646464"/>
     </LinearLayout>
+    </android.support.v7.widget.CardView>
 </ScrollView>

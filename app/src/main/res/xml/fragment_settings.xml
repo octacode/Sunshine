@@ -26,4 +26,13 @@
             android:key="@string/pref_notifications_enable"
             android:defaultValue="true"/>
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="Themes">
+        <ListPreference
+            android:title="Select Your Theme"
+            android:key="theme"
+            android:defaultValue="0"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"/>
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -1,9 +1,11 @@
 package octacode.allblue.code.sunshine;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,8 +17,12 @@ import octacode.allblue.code.sunshine.data.WeatherContract;
 
 
 
-public class SettingsActivity extends PreferenceActivity
-        implements Preference.OnPreferenceChangeListener {
+public class SettingsFragment extends PreferenceActivity
+        implements Preference.OnPreferenceChangeListener{
+
+    public SettingsFragment(){
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,11 +32,6 @@ public class SettingsActivity extends PreferenceActivity
         bindPreferenceSummaryToValue(findPreference(getString(R.string.UNIT_pref)));
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
 
     private void bindPreferenceSummaryToValue(Preference preference) {
         preference.setOnPreferenceChangeListener(this);
@@ -59,5 +60,11 @@ public class SettingsActivity extends PreferenceActivity
             preference.setSummary(string_Value);
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this,MainActivity.class));
     }
 }

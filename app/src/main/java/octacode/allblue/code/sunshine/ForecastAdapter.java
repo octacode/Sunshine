@@ -2,9 +2,11 @@ package octacode.allblue.code.sunshine;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +51,13 @@ public class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int view_type=getItemViewType(cursor.getPosition());
         if(view_type==0){
+
             View view = LayoutInflater.from(context).inflate(R.layout.list_item_forecast_today,parent,false);
+
+            if(PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme","0").matches("1")){
+                view.setBackground(new ColorDrawable(R.color.SunshineDark));
+            }
+
             ViewHolder viewHolder=new ViewHolder(view);
             view.setTag(viewHolder);
             return view;
