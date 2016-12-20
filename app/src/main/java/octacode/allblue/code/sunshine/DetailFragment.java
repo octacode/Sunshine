@@ -2,10 +2,12 @@ package octacode.allblue.code.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -52,9 +54,15 @@ public class DetailFragment extends Fragment{
 
         String date=data_fetched[0];
         String desc=data_fetched[1];
-        String min=data_fetched[2];
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
+        String manip=prefs.getString(getContext().getString(R.string.UNIT_pref),"0");
+        boolean isMetric=false;
+        if(manip.matches("0")){
+            isMetric=true;
+        }
+        String min=Utility.getformattedTemp(Double.parseDouble(data_fetched[2]),isMetric);
         min=min+"°";
-        String max=data_fetched[3];
+        String max=Utility.getformattedTemp(Double.parseDouble(data_fetched[3]),isMetric);
         max=max+"°";
         float degree= Float.parseFloat(data_fetched[4]);
         float wind_speed= Float.parseFloat(data_fetched[5]);

@@ -21,7 +21,7 @@
 
     <!-- Main activity action bar style -->
     <style name="ActionBar.Solid.Sunshine.NoTitle" parent="@style/ActionBar.Solid.Sunshine">
-        <item name="displayOptions">useLogo|showHome</item>
+        <item name="displayOptions">useLogo|showHome|showTitle</item>
         <item name="logo">@drawable/ic_logo</item>
     </style>
 </resources>

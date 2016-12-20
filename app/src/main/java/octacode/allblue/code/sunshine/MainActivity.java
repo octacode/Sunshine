@@ -27,4 +27,8 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             getSupportActionBar().setLogo(R.drawable.ic_logo);
         }
     }
+
+    public void action_name(String title){
+        getSupportActionBar().setTitle(title);
+    }
 }

@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
+import octacode.allblue.code.sunshine.data.WeatherContract.LocationEntry;
 import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
 import octacode.allblue.code.sunshine.data.Weatherdb;
 import octacode.allblue.code.sunshine.sync.SunshineSyncAdapter;
@@ -39,13 +40,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_MAX_TEMP,
             WeatherEntry.COLUMN_MIN_TEMP,
             WeatherEntry.COLUMN_WEATHER_ID,
-            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING,
+            LocationEntry.COLUMN_LOCATION_SETTING,
             WeatherEntry.COLUMN_DEGREE,
             WeatherEntry.COLUMN_WIND_SPEED,
             WeatherEntry.COLUMN_HUMIDITY,
             WeatherEntry.COLUMN_PRESSURE,
-            WeatherContract.LocationEntry.COLUMN_LATITUDE,
-            WeatherContract.LocationEntry.COLUMN_LONGITUDE
+            LocationEntry.COLUMN_LATITUDE,
+            LocationEntry.COLUMN_LONGITUDE,
+            LocationEntry.COLOUMN_CITY_NAME
     };
 
     public static final int COL_WEATHER_ID = 0;
@@ -61,6 +63,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_PRESSURE = 10;
     public static final int COL_LOCATION_LATITUDE=11;
     public static final int COL_LOCATION_LONGITUDE=12;
+    public static final int COL_LOCATION_CITY_NAME=13;
 
     public ForecastFragment() {
     }
@@ -76,7 +79,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         ((MainActivity) getActivity()).themeApplier();
+        Uri weatherLocationUri = WeatherEntry.buildWeatherLocation(Utility.getPreferredLocation(getContext()));
+        Cursor cursor=getContext().getContentResolver().query(
+                weatherLocationUri,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                null);
+        String city_name=new String();
+        while (cursor.moveToNext()){
+            city_name=cursor.getString(COL_LOCATION_CITY_NAME);
+        }
+        this.city_name=city_name;
+        ((MainActivity) getActivity()).action_name(city_name);
     }
+
+    String city_name;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -122,6 +140,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
         }
         updateweather();
+        ((MainActivity) getActivity()).action_name(city_name);
     }
 
     ForecastAdapter aAdapter;

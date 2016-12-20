@@ -23,12 +23,14 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -126,24 +128,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                forecastJsonStr = null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
+            StringBuffer buffer;
             String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
+            try (InputStream inputStream = urlConnection.getInputStream()) {
+                buffer = new StringBuffer();
+                if (inputStream == null) {
+                    forecastJsonStr = null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
 
-            if (buffer.length() == 0) {
-                forecastJsonStr = null;
-            }
-            forecastJsonStr = buffer.toString();
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
 
-        } catch (IOException e) {
+                if (buffer.length() == 0) {
+                    forecastJsonStr = null;
+                }
+                forecastJsonStr = buffer.toString();
+
+                }
+            catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
+        }
+            catch (IOException e) {
             Log.e("PlaceholderFragment", "Error ", e);
             forecastJsonStr = null;
         } finally {
@@ -223,7 +231,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         final String OWM_WEATHER = "weather";
         final String OWM_DESCRIPTION = "main";
         final String OWM_WEATHER_ID = "id";
-
+        if(forecastJsonStr!=null){
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
@@ -292,8 +300,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             getContext().getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI,cvarray);
             notifyWeather();
         }
-
-        insertWeatherIntoDatabase(cVVector);
+            insertWeatherIntoDatabase(cVVector);
+        }
     }
 
     private long insertLocationInDatabase(String locationSetting, String cityName, double lat, double lon) {
