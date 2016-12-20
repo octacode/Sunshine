@@ -26,15 +26,8 @@ import octacode.allblue.code.sunshine.data.Weatherdb;
 
 
 public class DetailFragment extends Fragment{
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
-    private TextView date_tv,max_tv,min_tv,desc_tv,humidity_tv,wind_speed_tv,pressure_tv;
+    private TextView date_tv,max_tv,min_tv,desc_tv,humidity_tv,wind_speed_tv,pressure_tv,day_tv;
     private ImageView icon_iv;
 
 
@@ -69,7 +62,8 @@ public class DetailFragment extends Fragment{
         View rootview = inflater.inflate(R.layout.fragment_detail, container, false);
 
         date_tv=(TextView)rootview.findViewById(R.id.detail_item_date);
-        date_tv.setText(date);
+        date_tv.setText(Utility.formatDate(Long.parseLong(date)*1000));
+        day_tv=(TextView)rootview.findViewById(R.id.detail_item_day);
         max_tv=(TextView)rootview.findViewById(R.id.detail_item_max);
         max_tv.setText(max);
         min_tv=(TextView)rootview.findViewById(R.id.detail_item_min);
@@ -106,23 +100,6 @@ public class DetailFragment extends Fragment{
                 startActivity(sendIntent);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     public interface OnFragmentInteractionListener {

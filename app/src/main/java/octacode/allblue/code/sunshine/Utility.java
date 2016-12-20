@@ -2,7 +2,12 @@ package octacode.allblue.code.sunshine;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.preference.PreferenceManager;
+
+import java.util.Calendar;
 
 /**
  * Created by shasha on 17/12/16.
@@ -89,6 +94,16 @@ public class Utility {
             return R.drawable.art_clouds;
         }
         return -1;
+    }
+
+    public static String formatDate(long milliseconds)  {
+        DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliseconds);
+        TimeZone tz = TimeZone.getDefault();
+        sdf.setTimeZone(tz);
+        return sdf.format(calendar.getTime());
     }
 
     public static String getFormattedWind(Context context, float windSpeed, float degrees) {

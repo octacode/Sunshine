@@ -2,12 +2,17 @@ package octacode.allblue.code.sunshine;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
 
@@ -74,7 +79,7 @@ public class ForecastAdapter extends CursorAdapter {
 
         String date_string=cursor.getString(ForecastFragment.COL_WEATHER_DATE);
         TextView date_text=(TextView)view.findViewById(R.id.list_item_date_textview);
-        date_text.setText(date_string);
+        date_text.setText(Utility.formatDate(Long.parseLong(date_string)*1000));
 
         double max=cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         TextView max_tv=(TextView)view.findViewById(R.id.list_item_max_textview);
@@ -89,6 +94,7 @@ public class ForecastAdapter extends CursorAdapter {
         String desc=cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         viewHolder.desc_tv.setText(desc);
     }
+
 }
 
 class ViewHolder{
