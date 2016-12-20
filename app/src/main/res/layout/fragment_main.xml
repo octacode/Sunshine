@@ -1,14 +1,27 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:layout_width="match_parent"
-    android:id="@+id/fragment_main"
     android:layout_height="match_parent"
-    tools:context="octacode.allblue.code.sunshine.ForecastFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/swipe"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/list_view_forecast">
     </ListView>
 
-</FrameLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="15dp"
+        android:id="@+id/empty"
+        android:visibility="invisible"
+        android:layout_centerInParent="true"
+        />
+
+</android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>

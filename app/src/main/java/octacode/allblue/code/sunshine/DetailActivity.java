@@ -6,9 +6,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.widget.Toast;
-
 public class DetailActivity extends AppCompatActivity implements DetailFragment.OnFragmentInteractionListener {
 
     @Override

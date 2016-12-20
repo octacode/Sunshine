@@ -3,9 +3,6 @@ package octacode.allblue.code.sunshine;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.TimeZone;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +11,6 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
-import octacode.allblue.code.sunshine.data.WeatherContract;
 
 /**
  * Created by shasha on 17/12/16.

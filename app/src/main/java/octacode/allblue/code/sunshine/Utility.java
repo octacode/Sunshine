@@ -5,13 +5,17 @@ import android.content.SharedPreferences;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 
 import java.util.Calendar;
 
 /**
  * Created by shasha on 17/12/16.
  */
+
 public class Utility {
 
     public static String getPreferredLocation(Context mContext){
@@ -115,9 +119,6 @@ public class Utility {
             windSpeed = .621371192237334f * windSpeed;
         }
 
-        // From wind direction in degrees, determine compass direction as a string (e.g NW)
-        // You know what's fun, writing really long if/else statements with tons of possible
-        // conditions.  Seriously, try it!
         String direction = "Unknown";
         if (degrees >= 337.5 || degrees < 22.5) {
             direction = "N";
@@ -138,4 +139,22 @@ public class Utility {
         }
         return String.format(context.getString(windFormat), windSpeed, direction);
     }
+
+    public static boolean hasNetworkConnection(Context context) {
+        boolean hasConnectedWifi = false;
+        boolean hasConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    hasConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    hasConnectedMobile = true;
+        }
+        return hasConnectedWifi || hasConnectedMobile;
+    }
+
 }

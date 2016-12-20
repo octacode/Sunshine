@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import octacode.allblue.code.sunshine.data.WeatherContract;
 import octacode.allblue.code.sunshine.data.WeatherContract.LocationEntry;
 import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
 import octacode.allblue.code.sunshine.data.Weatherdb;

@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import org.junit.internal.runners.statements.Fail;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
 import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;

@@ -3,8 +3,6 @@ package octacode.allblue.code.sunshine;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,7 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,17 +19,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import octacode.allblue.code.sunshine.data.WeatherContract;
 import octacode.allblue.code.sunshine.data.WeatherContract.LocationEntry;
 import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
-import octacode.allblue.code.sunshine.data.Weatherdb;
 import octacode.allblue.code.sunshine.sync.SunshineSyncAdapter;
 
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private String mlocation;
+    public SwipeRefreshLayout swipeRefreshLayout;
     private static int FORECAST_LOADER=0;
     private static final String[] FORECAST_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
@@ -86,12 +86,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 null,
                 null,
                 null);
-        String city_name=new String();
+        String city_name= "";
+        assert cursor != null;
         while (cursor.moveToNext()){
             city_name=cursor.getString(COL_LOCATION_CITY_NAME);
         }
         this.city_name=city_name;
         ((MainActivity) getActivity()).action_name(city_name);
+        swipeRefreshLayout=(SwipeRefreshLayout)getActivity().findViewById(R.id.swipe);
     }
 
     String city_name;
@@ -131,7 +133,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onStart() {
         super.onStart();
         updateweather();
+        ((MainActivity) getActivity()).action_name(city_name);
     }
+
 
     @Override
     public void onResume() {
@@ -144,14 +148,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     ForecastAdapter aAdapter;
-
+    View rootview;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         aAdapter=new ForecastAdapter(getContext(),null,0);
-        View rootview = inflater.inflate(R.layout.fragment_main, container, false);
-
+        rootview = inflater.inflate(R.layout.fragment_main, container, false);
+        swipeRefreshLayout=(SwipeRefreshLayout)rootview.findViewById(R.id.swipe);
         final ListView lv = (ListView) rootview.findViewById(R.id.list_view_forecast);
         lv.setAdapter(aAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -183,6 +187,19 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 };
                 i.putExtra(Intent.EXTRA_TEXT,data_transfer);
                 startActivity(i);
+            }
+        });
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootview.findViewById(R.id.swipe);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (Utility.hasNetworkConnection(getActivity())) {
+                    updateweather();
+                } else {
+                    Toast.makeText(getContext(), "Network Not Available!", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
         return rootview;
@@ -218,7 +235,20 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        swipeRefreshLayout.setRefreshing(false);
+        TextView no_data=(TextView)getActivity().findViewById(R.id.empty);
         aAdapter.swapCursor(data);
+        try{
+            if (aAdapter.getCount() == 0) {
+                no_data.setText("No data fetched.");
+                no_data.setVisibility(View.VISIBLE);
+            }
+            else {
+                no_data.setVisibility(View.INVISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

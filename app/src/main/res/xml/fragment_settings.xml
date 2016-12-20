@@ -4,10 +4,9 @@
     <PreferenceCategory android:title="Location Settings">
         <EditTextPreference
             android:key="@string/ZIP_pref"
-            android:title="ZIP Code"
+            android:title="Location"
             android:defaultValue="94043"
-            android:summary="Enter the postal code of your location."
-            />
+            android:summary="Enter your location or postal-code."/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Unit and Measurement">

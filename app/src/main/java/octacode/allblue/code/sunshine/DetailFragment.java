@@ -1,17 +1,11 @@
 package octacode.allblue.code.sunshine;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,11 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import octacode.allblue.code.sunshine.data.WeatherContract;
-import octacode.allblue.code.sunshine.data.WeatherContract.WeatherEntry;
-import octacode.allblue.code.sunshine.data.Weatherdb;
 
 
 public class DetailFragment extends Fragment{

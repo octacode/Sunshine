@@ -1,14 +1,8 @@
 package octacode.allblue.code.sunshine.data;
 
 import android.content.ContentUris;
-import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.provider.BaseColumns;
-
-import java.text.DateFormat;
-import java.util.Date;
-
-import static android.provider.Settings.System.DATE_FORMAT;
 
 /**
  * Created by shasha on 14/12/16.
