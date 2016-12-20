@@ -255,8 +255,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             double windSpeed;
             double windDirection;
 
-            double high;
-            double low;
+            int high;
+            int low;
 
             String description;
             int weatherId;
@@ -275,8 +275,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             weatherId = weatherObject.getInt(OWM_WEATHER_ID);
 
             JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            high = temperatureObject.getDouble(OWM_MAX);
-            low = temperatureObject.getDouble(OWM_MIN);
+            high = temperatureObject.getInt(OWM_MAX);
+            low = temperatureObject.getInt(OWM_MIN);
 
             ContentValues weatherValues = new ContentValues();
 
