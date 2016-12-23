@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Vector;
 
 import octacode.allblue.code.sunshine.MainActivity;
@@ -296,6 +297,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             cVVector.toArray(cvarray);
             getContext().getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI,cvarray);
             notifyWeather();
+            Calendar calendar=Calendar.getInstance();
+            calendar.add(Calendar.DATE,-1);
+            String yesterday_date=calendar.getTime().toString();
+            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI,WeatherEntry.COLUMN_DATE_TEXT+" <= ? ",
+                    new String[] {yesterday_date});
         }
             insertWeatherIntoDatabase(cVVector);
         }
