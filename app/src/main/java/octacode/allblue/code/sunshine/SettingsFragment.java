@@ -44,6 +44,7 @@ public class SettingsFragment extends PreferenceActivity
         else{
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI,null);
         }
+
         if(preference instanceof ListPreference){
             ListPreference listPreference=(ListPreference)preference;
             int prefIndex=listPreference.findIndexOfValue(string_Value);
@@ -54,11 +55,5 @@ public class SettingsFragment extends PreferenceActivity
             preference.setSummary(string_Value);
         }
         return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this,MainActivity.class));
     }
 }
