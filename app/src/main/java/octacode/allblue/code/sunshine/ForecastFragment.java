@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +31,13 @@ import octacode.allblue.code.sunshine.sync.SunshineSyncAdapter;
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    public interface titleUpdateEventListener{
+        public void updateEvent(String name);
+    }
+
     private String mlocation;
+    private titleUpdateEventListener titleUpdateEventListener;
+
     public SwipeRefreshLayout swipeRefreshLayout;
     private static int FORECAST_LOADER=0;
     private static final String[] FORECAST_COLUMNS = {
@@ -78,7 +85,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        ((MainActivity) getActivity()).themeApplier();
         Uri weatherLocationUri = WeatherEntry.buildWeatherLocation(Utility.getPreferredLocation(getContext()));
         Cursor cursor=getContext().getContentResolver().query(
                 weatherLocationUri,
@@ -92,7 +98,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             city_name=cursor.getString(COL_LOCATION_CITY_NAME);
         }
         this.city_name=city_name;
-        ((MainActivity) getActivity()).action_name(city_name);
         swipeRefreshLayout=(SwipeRefreshLayout)getActivity().findViewById(R.id.swipe);
     }
 
@@ -108,7 +113,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivity(new Intent(getActivity(),SettingsFragment.class));
+                startActivity(new Intent(getActivity(),SettingsActivity.class));
                 return true;
             case R.id.action_location:
                 Cursor cursor=aAdapter.getCursor();
@@ -127,13 +132,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateweather() {
         SunshineSyncAdapter.syncImmediately(getActivity());
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(city_name);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         updateweather();
-        ((MainActivity) getActivity()).action_name(city_name);
     }
 
 
@@ -144,7 +149,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
         }
         updateweather();
-        ((MainActivity) getActivity()).action_name(city_name);
     }
 
     ForecastAdapter aAdapter;
